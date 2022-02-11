@@ -2,6 +2,7 @@ package com.company;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Locale;
@@ -33,7 +34,9 @@ public class EchoServer {
         var input = socket.getInputStream();
         var isr = new InputStreamReader(input,"UTF-8");
         Scanner scanner = new Scanner(isr);
-        try(scanner){
+        var output = socket.getOutputStream();
+        var writer = new PrintWriter(output);
+        try(scanner; writer){
             while (true){
                 var message = scanner.nextLine().strip();
                 System.out.printf("Got: %s%n", message);
@@ -42,6 +45,9 @@ public class EchoServer {
                     return;
                 } else {
                     System.out.println(reverseString(message));
+                    writer.write(reverseString(message));
+                    writer.write(System.lineSeparator());
+                    writer.flush();
                 }
             }
         }catch (NoSuchElementException ex){
